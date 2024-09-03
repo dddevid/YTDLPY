@@ -1,0 +1,35 @@
+Fair Source License
+
+Copyright (c) [Year] [Your Team Name or Your Name]
+
+Version 1.0
+
+1. Definition and Acceptance
+
+This software is licensed, not sold. By using this software, you agree to the terms of the Fair Source License. If you do not agree to the terms, do not use this software.
+
+2. License
+
+Under the terms of this license, you may:
+
+Use, modify, and distribute the software for personal and non-commercial purposes.
+Distribute modified versions of the software, provided they include a reference to this license and comply with the terms of the Fair Source License.
+3. Commercial Use
+
+The software may be used for commercial purposes only with prior written permission from the copyright holders. To obtain such permission, contact [Your Contact Email or Address].
+
+4. Removal and Revocation
+
+The copyright holders reserve the right to request the removal of the software or its modified versions at any time and for any reason. Upon request, you must immediately cease all use and distribution of the software and remove all copies of the software from your machine and servers.
+
+5. No Warranty
+
+The software is provided "as is," without any warranties of any kind. The copyright holders are not responsible for any damages resulting from the use of the software.
+
+6. Governing Law
+
+This agreement will be governed by and construed in accordance with the laws of the state of [Your State or Country], without regard to its conflict of laws principles.
+
+7. Acceptance of Terms
+
+Using the software implies acceptance of all terms and conditions of this license.
