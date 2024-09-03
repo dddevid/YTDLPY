@@ -1,6 +1,6 @@
-/* Custom styles */
 .hero {
-    background-color: #00d1b2; /* Bulma's primary color */
+    position: relative;
+    background-color: #00d1b2;
 }
 
 .title {
@@ -23,49 +23,57 @@
 }
 
 .image img {
-    max-width: 100%; /* Responsive width */
-    height: auto;    /* Maintain aspect ratio */
+    max-width: 100%;
+    height: auto;
 }
 
 .image img.logo {
-    max-width: 200px; /* Set a smaller maximum width for the logo */
+    max-width: 200px;
 }
 
 .section-spacing {
-    margin-bottom: 20px; /* Reduced space between sections */
+    margin-bottom: 20px;
 }
 
-/* GitHub logo positioning */
 .github-logo {
     position: absolute;
     top: 10px;
     right: 10px;
-    max-width: 80px; /* Smaller width for the GitHub logo */
-    height: auto; /* Maintain aspect ratio */
+    max-width: 100px;
+    height: auto;
 }
 
-/* Reduce spacing below text */
+
+.hero-logo {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    max-width: 150px;
+    height: auto;
+}
+
+
 .content {
-    margin-bottom: 10px; /* Reduced space below text */
+    margin-bottom: 10px;
 }
 
 .columns {
-    margin-bottom: 10px; /* Reduced space below columns */
+    margin-bottom: 10px;
 }
 
 .column {
-    padding-bottom: 10px; /* Reduced padding below columns */
+    padding-bottom: 10px;
 }
 
 .hero-body {
-    margin-bottom: 20px; /* Adjust margin below hero section */
+    margin-bottom: 20px;
 }
 
-/* Add space between download links */
+
 ul {
-    padding-left: 0; /* Remove default list padding */
+    padding-left: 0;
 }
 
 li {
-    margin-bottom: 15px; /* Add space between list items */
+    margin-bottom: 15px;
 }
