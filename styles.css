@@ -34,3 +34,11 @@
 .section-spacing {
     margin-bottom: 30px; /* Space between sections */
 }
+
+/* GitHub logo positioning */
+.github-logo {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    max-width: 150px; /* Adjust size as needed */
+}
