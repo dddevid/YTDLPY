@@ -1,6 +1,13 @@
+/* Custom styles */
 .hero {
-    position: relative;
-    background-color: #00d1b2;
+    position: relative; /* Ensure that the hero section is positioned relative */
+    background-color: #00d1b2; /* Bulma's primary color */
+}
+
+.hero-content {
+    display: flex; /* Use flexbox for alignment */
+    align-items: center; /* Center items vertically */
+    gap: 20px; /* Space between the logo and text */
 }
 
 .title {
@@ -23,57 +30,55 @@
 }
 
 .image img {
-    max-width: 100%;
-    height: auto;
+    max-width: 100%; /* Responsive width */
+    height: auto;    /* Maintain aspect ratio */
 }
 
 .image img.logo {
-    max-width: 200px;
+    max-width: 200px; /* Set a smaller maximum width for the logo */
 }
 
 .section-spacing {
-    margin-bottom: 20px;
+    margin-bottom: 20px; /* Reduced space between sections */
 }
 
+/* GitHub logo positioning */
 .github-logo {
     position: absolute;
     top: 10px;
     right: 10px;
-    max-width: 100px;
-    height: auto;
+    max-width: 100px; /* Smaller width for the GitHub logo */
+    height: auto; /* Maintain aspect ratio */
 }
 
-
+/* YTDLPY Logo positioning in hero section */
 .hero-logo {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    max-width: 150px;
-    height: auto;
+    max-width: 80px; /* Set a smaller maximum width for the YTDLPY logo */
+    height: auto; /* Maintain aspect ratio */
 }
 
-
+/* Reduce spacing below text */
 .content {
-    margin-bottom: 10px;
+    margin-bottom: 10px; /* Reduced space below text */
 }
 
 .columns {
-    margin-bottom: 10px;
+    margin-bottom: 10px; /* Reduced space below columns */
 }
 
 .column {
-    padding-bottom: 10px;
+    padding-bottom: 10px; /* Reduced padding below columns */
 }
 
 .hero-body {
-    margin-bottom: 20px;
+    margin-bottom: 20px; /* Adjust margin below hero section */
 }
 
-
+/* Add space between download links */
 ul {
-    padding-left: 0;
+    padding-left: 0; /* Remove default list padding */
 }
 
 li {
-    margin-bottom: 15px;
+    margin-bottom: 15px; /* Add space between list items */
 }
