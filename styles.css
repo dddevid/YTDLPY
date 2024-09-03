@@ -1,0 +1,28 @@
+/* Custom styles */
+.hero {
+    background-color: #00d1b2; /* Bulma's primary color */
+}
+
+.title {
+    color: #fff;
+}
+
+.subtitle {
+    color: #fff;
+}
+
+.button.is-link {
+    background-color: #00d1b2;
+    border-color: #00d1b2;
+    color: #fff;
+}
+
+.button.is-link:hover {
+    background-color: #00c4a7;
+    border-color: #00c4a7;
+}
+
+.image img {
+    max-width: 100%;
+    height: auto;
+}
