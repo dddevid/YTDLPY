@@ -59,4 +59,4 @@ This project is licensed under the [Fair Source License](https://github.com/ddde
 
 ## Contact
 
-For any inquiries, please contact [support@example.com](mailto:support@example.com).
+For any inquiries, please contact [devidrru@hotmail.com](mailto:devidrru@hotmail.com).
