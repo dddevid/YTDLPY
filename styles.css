@@ -28,7 +28,7 @@
 }
 
 .image img.logo {
-    max-width: 300px; /* Set a maximum width for the logo */
+    max-width: 200px; /* Set a smaller maximum width for the logo */
 }
 
 .section-spacing {
@@ -40,23 +40,32 @@
     position: absolute;
     top: 10px;
     right: 10px;
-    max-width: 100px; /* Set a smaller width for the GitHub logo */
+    max-width: 80px; /* Smaller width for the GitHub logo */
     height: auto; /* Maintain aspect ratio */
 }
 
 /* Reduce spacing below text */
 .content {
-    margin-bottom: 0; /* Remove extra bottom margin */
+    margin-bottom: 10px; /* Reduced space below text */
 }
 
 .columns {
-    margin-bottom: 0; /* Remove extra bottom margin */
+    margin-bottom: 10px; /* Reduced space below columns */
 }
 
 .column {
-    padding-bottom: 0; /* Remove extra bottom padding */
+    padding-bottom: 10px; /* Reduced padding below columns */
 }
 
 .hero-body {
     margin-bottom: 20px; /* Adjust margin below hero section */
+}
+
+/* Add space between download links */
+ul {
+    padding-left: 0; /* Remove default list padding */
+}
+
+li {
+    margin-bottom: 15px; /* Add space between list items */
 }
