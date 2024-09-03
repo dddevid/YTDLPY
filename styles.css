@@ -29,6 +29,17 @@
     border-color: #00c4a7;
 }
 
+.button.is-primary {
+    background-color: #00d1b2;
+    border-color: #00d1b2;
+    color: #fff;
+}
+
+.button.is-primary:hover {
+    background-color: #00c4a7;
+    border-color: #00c4a7;
+}
+
 .image img {
     max-width: 100%; /* Responsive width */
     height: auto;    /* Maintain aspect ratio */
@@ -84,4 +95,9 @@ ul {
 
 li {
     margin-bottom: 15px; /* Add space between list items */
+}
+
+/* PayPal Button */
+.paypal-button {
+    margin-top: 20px; /* Add margin above the button */
 }
