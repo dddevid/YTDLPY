@@ -32,7 +32,7 @@
 }
 
 .section-spacing {
-    margin-bottom: 30px; /* Space between sections */
+    margin-bottom: 20px; /* Reduced space between sections */
 }
 
 /* GitHub logo positioning */
@@ -42,4 +42,21 @@
     right: 10px;
     max-width: 100px; /* Set a smaller width for the GitHub logo */
     height: auto; /* Maintain aspect ratio */
+}
+
+/* Reduce spacing below text */
+.content {
+    margin-bottom: 0; /* Remove extra bottom margin */
+}
+
+.columns {
+    margin-bottom: 0; /* Remove extra bottom margin */
+}
+
+.column {
+    padding-bottom: 0; /* Remove extra bottom padding */
+}
+
+.hero-body {
+    margin-bottom: 20px; /* Adjust margin below hero section */
 }
