@@ -30,3 +30,7 @@
 .image img.logo {
     max-width: 300px; /* Set a maximum width for the logo */
 }
+
+.section-spacing {
+    margin-bottom: 30px; /* Space between sections */
+}
