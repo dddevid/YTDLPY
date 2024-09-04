@@ -8,6 +8,7 @@ from tkinter import messagebox, scrolledtext, ttk
 import re
 import threading
 import traceback
+import yt_dlp
 
 def create_log_folder():
     user_dir = Path.home()
