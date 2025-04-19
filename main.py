@@ -4,11 +4,13 @@ import os
 from pathlib import Path
 from datetime import datetime
 import tkinter as tk
-from tkinter import messagebox, scrolledtext, ttk
+from tkinter import messagebox, scrolledtext, ttk, filedialog
 import re
 import threading
 import traceback
 import yt_dlp
+from PIL import Image, ImageTk
+import webbrowser
 
 def create_log_folder():
     user_dir = Path.home()
@@ -29,7 +31,7 @@ def save_crash_log(e):
 def clean_filename(name):
     return re.sub(r'[\\/:*?"<>|]', ' ', name)
 
-def download_video(url, log_callback):
+def download_media(url, format_type, quality, output_dir, log_callback):
     try:
         with yt_dlp.YoutubeDL() as ydl:
             info_dict = ydl.extract_info(url, download=False)
@@ -37,125 +39,399 @@ def download_video(url, log_callback):
             if video_title:
                 video_title = clean_filename(video_title)
             else:
-                video_title = "untitled_video"
-
-        video_file = f"{video_title}.mp4"
-
-        video_options = {
-            'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
-            'outtmpl': video_file,
-            'progress_hooks': [log_callback]
+                video_title = "untitled_media"
+        
+        options = {
+            'outtmpl': os.path.join(output_dir, f"{video_title}.%(ext)s"),
+            'progress_hooks': [log_callback],
         }
-        with yt_dlp.YoutubeDL(video_options) as ydl:
+        
+        if format_type == "mp3":
+            options.update({
+                'format': 'bestaudio/best',
+                'postprocessors': [{
+                    'key': 'FFmpegExtractAudio',
+                    'preferredcodec': 'mp3',
+                    'preferredquality': quality,
+                }]
+            })
+            file_extension = "mp3"
+        else:  # mp4
+            if quality == "high":
+                options['format'] = 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best'
+            elif quality == "medium":
+                options['format'] = 'bestvideo[height<=720][ext=mp4]+bestaudio[ext=m4a]/best[height<=720][ext=mp4]/best'
+            else:  # low
+                options['format'] = 'bestvideo[height<=480][ext=mp4]+bestaudio[ext=m4a]/best[height<=480][ext=mp4]/best'
+            file_extension = "mp4"
+
+        with yt_dlp.YoutubeDL(options) as ydl:
             ydl.download([url])
 
-        return video_title, video_file
+        return video_title, f"{video_title}.{file_extension}"
 
     except Exception as e:
         save_crash_log(e)
         return None, None
 
-def start_download():
-    url = url_entry.get()
-    if not url:
-        messagebox.showwarning("Missing URL", "Please enter a valid URL.")
-        return
+class HoverButton(tk.Canvas):
+    def __init__(self, master=None, text='', command=None, width=120, height=35, 
+                 bg_color="#FF0000", text_color="white", hover_color="#D10000",
+                 corner_radius=18, font=("Segoe UI", 12, "bold"), **kw):
+        # Usa il colore di sfondo del parent frame o un colore predefinito se non disponibile
+        parent_bg = "#121212"  # Colore di sfondo predefinito
+        super().__init__(master, width=width, height=height, bg=parent_bg,
+                        highlightthickness=0, **kw)
+        self.bg_color = bg_color
+        self.hover_color = hover_color
+        self.text_color = text_color
+        self.corner_radius = corner_radius
+        self.command = command
+        
+        # Create rounded rectangle
+        self.normal_bg = self._create_rounded_rect(0, 0, width, height, corner_radius, bg_color)
+        # Create text
+        self.text_id = self.create_text(width/2, height/2, text=text, fill=text_color, font=font)
+        
+        # Bind events
+        self.bind("<Enter>", self._on_enter)
+        self.bind("<Leave>", self._on_leave)
+        self.bind("<Button-1>", self._on_click)
+        self.bind("<ButtonRelease-1>", self._on_release)
+    
+    def _create_rounded_rect(self, x1, y1, x2, y2, radius, color):
+        points = [
+            x1+radius, y1,
+            x2-radius, y1,
+            x2, y1,
+            x2, y1+radius,
+            x2, y2-radius,
+            x2, y2,
+            x2-radius, y2,
+            x1+radius, y2,
+            x1, y2,
+            x1, y2-radius,
+            x1, y1+radius,
+            x1, y1
+        ]
+        return self.create_polygon(points, fill=color, smooth=True, outline=color)
+    
+    def _on_enter(self, event):
+        self.itemconfig(self.normal_bg, fill=self.hover_color, outline=self.hover_color)
+        self.config(cursor="hand2")
+    
+    def _on_leave(self, event):
+        self.itemconfig(self.normal_bg, fill=self.bg_color, outline=self.bg_color)
+        self.config(cursor="")
+    
+    def _on_click(self, event):
+        self.itemconfig(self.normal_bg, fill="#900000", outline="#900000")
+    
+    def _on_release(self, event):
+        self.itemconfig(self.normal_bg, fill=self.hover_color, outline=self.hover_color)
+        if self.command:
+            self.command()
 
-    def log_callback(d, log_text):
-        if d['status'] == 'downloading':
-            log_message = f"Downloading: {d.get('filename', 'Unknown')} - {d.get('downloaded_bytes', 0)} bytes downloaded\n"
-            log_text.insert(tk.END, log_message)
-            log_text.yview(tk.END)
-            root.update_idletasks()
-
-    def download_with_log():
+class App:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("YTDLPY")
+        self.root.geometry("700x500")
+        self.root.configure(bg="#121212")
+        self.root.resizable(True, True)
+        
+        # Set min size
+        self.root.minsize(700, 500)
+        
+        # Set application icon if available
         try:
-            log_window = tk.Toplevel(root)
-            log_window.title("Download Log")
-            log_window.geometry("600x200")
-            log_window.configure(bg="#0f0f0f")
+            icon_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "icons", "YTDLPY.png")
+            if os.path.exists(icon_path):
+                icon = ImageTk.PhotoImage(Image.open(icon_path))
+                self.root.iconphoto(True, icon)
+        except:
+            pass
 
-            log_text = scrolledtext.ScrolledText(log_window, wrap=tk.WORD, font=("Segoe UI", 10), bg="#181818", fg="white")
-            log_text.pack(expand=True, fill=tk.BOTH, padx=10, pady=10)
+        # Style configuration
+        self.style = ttk.Style()
+        self.style.theme_use("clam")
+        self.style.configure("TLabel", background="#121212", foreground="white", font=("Segoe UI", 11))
+        self.style.configure("TEntry", font=("Segoe UI", 12), padding=10, relief="flat", fieldbackground="#1E1E1E", foreground="white")
+        self.style.configure("TButton", font=("Segoe UI", 12), padding=10, background="#FF0000")
+        self.style.configure("TFrame", background="#121212")
+        self.style.configure("TCombobox", fieldbackground="#1E1E1E", background="#1E1E1E", foreground="white", selectbackground="#121212", selectforeground="white")
+        self.style.map('TCombobox', fieldbackground=[('readonly', '#1E1E1E')], selectbackground=[('readonly', '#121212')])
+        
+        # Configure grid
+        self.root.grid_columnconfigure(0, weight=1)
+        self.root.grid_rowconfigure(0, weight=0)
+        self.root.grid_rowconfigure(1, weight=1)
+        self.root.grid_rowconfigure(2, weight=0)
+        
+        # Main frames
+        self.header_frame = ttk.Frame(root)
+        self.header_frame.grid(row=0, column=0, sticky="ew", padx=20, pady=(20, 0))
+        self.header_frame.columnconfigure(0, weight=1)
+        
+        self.content_frame = ttk.Frame(root)
+        self.content_frame.grid(row=1, column=0, sticky="nsew", padx=20, pady=10)
+        self.content_frame.columnconfigure(0, weight=1)
+        self.content_frame.rowconfigure(0, weight=0)
+        self.content_frame.rowconfigure(1, weight=1)
+        
+        self.footer_frame = ttk.Frame(root)
+        self.footer_frame.grid(row=2, column=0, sticky="ew", padx=20, pady=(0, 20))
+        
+        self.create_header()
+        self.create_content()
+        self.create_footer()
+        
+        # Set Default values
+        self.format_var.set("mp4")
+        self.quality_var.set("high")
+        
+        # Initial directory for saving files
+        self.output_dir = os.path.dirname(os.path.abspath(__file__))
+        
+    def create_header(self):
+        # Title and logo
+        title_label = ttk.Label(self.header_frame, text="YTDLPY", font=("Segoe UI", 24, "bold"))
+        title_label.grid(row=0, column=0, sticky="w")
+        
+        subtitle_label = ttk.Label(self.header_frame, text="Advanced YouTube Downloader", font=("Segoe UI", 12))
+        subtitle_label.grid(row=1, column=0, sticky="w", pady=(0, 10))
+        
+        # Instructions button
+        instructions_button = ttk.Button(self.header_frame, text="Instructions", command=self.show_instructions)
+        instructions_button.grid(row=0, column=1, rowspan=2, sticky="e")
+        
+    def create_content(self):
+        # URL input frame
+        url_frame = ttk.Frame(self.content_frame)
+        url_frame.grid(row=0, column=0, sticky="ew", pady=(10, 0))
+        url_frame.columnconfigure(1, weight=1)
+        
+        url_label = ttk.Label(url_frame, text="Enter Video URL:")
+        url_label.grid(row=0, column=0, sticky="w", padx=(0, 10), pady=10)
+        
+        self.url_entry = ttk.Entry(url_frame)
+        self.url_entry.grid(row=0, column=1, sticky="ew", pady=10)
+        self.url_entry.bind("<Button-3>", self.paste)
+        
+        paste_button = ttk.Button(url_frame, text="Paste", command=lambda: self.url_entry.event_generate("<<Paste>>"))
+        paste_button.grid(row=0, column=2, sticky="e", padx=(10, 0), pady=10)
+        
+        # Options frame
+        options_frame = ttk.Frame(self.content_frame)
+        options_frame.grid(row=1, column=0, sticky="ew", pady=(20, 0))
+        options_frame.columnconfigure(0, weight=1)
+        options_frame.columnconfigure(1, weight=1)
+        options_frame.columnconfigure(2, weight=1)
+        
+        # Format selection
+        format_frame = ttk.Frame(options_frame)
+        format_frame.grid(row=0, column=0, sticky="nsew", padx=(0, 10), pady=10)
+        
+        format_label = ttk.Label(format_frame, text="Format:", font=("Segoe UI", 12, "bold"))
+        format_label.pack(pady=(0, 10))
+        
+        self.format_var = tk.StringVar()
+        mp4_radio = ttk.Radiobutton(format_frame, text="MP4 (Video)", value="mp4", variable=self.format_var)
+        mp4_radio.pack(anchor="w", pady=2)
+        
+        mp3_radio = ttk.Radiobutton(format_frame, text="MP3 (Audio)", value="mp3", variable=self.format_var)
+        mp3_radio.pack(anchor="w", pady=2)
+        
+        # Quality selection
+        quality_frame = ttk.Frame(options_frame)
+        quality_frame.grid(row=0, column=1, sticky="nsew", padx=10, pady=10)
+        
+        quality_label = ttk.Label(quality_frame, text="Quality:", font=("Segoe UI", 12, "bold"))
+        quality_label.pack(pady=(0, 10))
+        
+        self.quality_var = tk.StringVar()
+        high_radio = ttk.Radiobutton(quality_frame, text="High", value="high", variable=self.quality_var)
+        high_radio.pack(anchor="w", pady=2)
+        
+        medium_radio = ttk.Radiobutton(quality_frame, text="Medium (720p)", value="medium", variable=self.quality_var)
+        medium_radio.pack(anchor="w", pady=2)
+        
+        low_radio = ttk.Radiobutton(quality_frame, text="Low (480p)", value="low", variable=self.quality_var)
+        low_radio.pack(anchor="w", pady=2)
+        
+        # Output directory
+        output_frame = ttk.Frame(options_frame)
+        output_frame.grid(row=0, column=2, sticky="nsew", padx=(10, 0), pady=10)
+        
+        output_label = ttk.Label(output_frame, text="Output:", font=("Segoe UI", 12, "bold"))
+        output_label.pack(pady=(0, 10))
+        
+        browse_button = ttk.Button(output_frame, text="Select Folder", command=self.select_output_directory)
+        browse_button.pack(anchor="w", pady=2)
+        
+        self.output_path_label = ttk.Label(output_frame, text="Default folder", font=("Segoe UI", 9), wraplength=200)
+        self.output_path_label.pack(anchor="w", pady=2)
+        
+        # Result display
+        self.result_frame = ttk.Frame(self.content_frame)
+        self.result_frame.grid(row=2, column=0, sticky="ew", pady=(20, 0))
+        self.result_frame.columnconfigure(0, weight=1)
+        
+        self.result_label = ttk.Label(self.result_frame, text="Ready to download", font=("Segoe UI", 11))
+        self.result_label.grid(row=0, column=0, sticky="w")
+        
+    def create_footer(self):
+        # Download button with custom rounded style
+        self.download_button = HoverButton(
+            self.footer_frame, 
+            text="DOWNLOAD", 
+            command=self.start_download,
+            width=200, 
+            height=40,
+            bg_color="#FF0000",
+            hover_color="#D10000",
+            corner_radius=20
+        )
+        self.download_button.pack(side=tk.LEFT, padx=(0, 10))
+        
+        # Version info and GitHub link
+        version_frame = ttk.Frame(self.footer_frame)
+        version_frame.pack(side=tk.RIGHT)
+        
+        version_label = ttk.Label(version_frame, text="Version 2.0", font=("Segoe UI", 9))
+        version_label.grid(row=0, column=0, sticky="e")
+        
+        github_link = ttk.Label(version_frame, text="Visit GitHub", font=("Segoe UI", 9), foreground="#3498db", cursor="hand2")
+        github_link.grid(row=1, column=0, sticky="e")
+        github_link.bind("<Button-1>", lambda e: webbrowser.open("https://github.com/dddevid/YTDLPY"))
+        
+    def select_output_directory(self):
+        directory = filedialog.askdirectory(initialdir=self.output_dir)
+        if directory:
+            self.output_dir = directory
+            # Truncate path for display if too long
+            display_path = directory
+            if len(display_path) > 30:
+                display_path = "..." + display_path[-27:]
+            self.output_path_label.config(text=display_path)
 
-            def internal_log_callback(d):
-                log_callback(d, log_text)
-
-            video_title, video_file = download_video(url, internal_log_callback)
-            if video_title and video_file:
-                messagebox.showinfo("Download Complete", f"The video was successfully downloaded! Saved as {video_title}.mp4.")
-        except Exception as e:
-            save_crash_log(e)
-        finally:
-            log_window.destroy()
-
-    threading.Thread(target=download_with_log, daemon=True).start()
-
-def paste(event):
-    url_entry.event_generate("<<Paste>>")
-
-def show_instructions():
-    instructions = (
-        "1. Enter the YouTube video URL you want to download in the designated field.\n"
-        "2. Press the 'Download' button to start the video download.\n"
-        "3. The video will be downloaded in the highest available quality and saved as an MP4 file.\n"
-        "4. You can paste the URL directly from the clipboard by right-clicking in the URL field.\n"
-        "5. Monitor the download progress in the log window that appears after the download starts.\n"
-        "6. Once the download is complete, the video will be available in the folder where this program is located."
-    )
-    messagebox.showinfo("Instructions", instructions)
-
-root = tk.Tk()
-root.title("YTDLPY")
-root.geometry("400x250")
-root.configure(bg="#0f0f0f")
-
-root.resizable(False, False)
-
-style = ttk.Style()
-style.theme_use("clam")
-style.configure("TEntry", font=("Segoe UI", 12), padding=10, relief="flat", fieldbackground="#181818", foreground="white")
-
-canvas = tk.Canvas(root, bg="#0f0f0f", bd=0, highlightthickness=0)
-canvas.place(relx=0, rely=0, relwidth=1, relheight=1)
-
-welcome_label = tk.Label(root, text="Download YouTube Videos", font=("Segoe UI", 16), bg="#0f0f0f", fg="white")
-welcome_label.place(relx=0.5, y=50, anchor="center")
-
-url_entry = ttk.Entry(root, width=50, style="TEntry")
-url_entry.place(relx=0.5, y=100, anchor="center", width=300, height=35)
-
-url_entry.bind("<Button-3>", paste)
-
-instructions_button = tk.Button(root, text="Instructions", font=("Segoe UI", 10), bg="#0f0f0f", fg="white", command=show_instructions)
-instructions_button.place(relx=0.95, rely=0.05, anchor="ne")
-
-def create_rounded_button(canvas, x, y, width, height, radius, bg_color, text_color, text, command):
-    canvas.create_oval(x, y, x+radius*2, y+radius*2, fill=bg_color, outline=bg_color)
-    canvas.create_oval(x+width-radius*2, y, x+width, y+radius*2, fill=bg_color, outline=bg_color)
-    canvas.create_oval(x, y+height-radius*2, x+radius*2, y+height, fill=bg_color, outline=bg_color)
-    canvas.create_oval(x+width-radius*2, y+height-radius*2, x+width, y+height, fill=bg_color, outline=bg_color)
-    canvas.create_rectangle(x+radius, y, x+width-radius, y+height, fill=bg_color, outline=bg_color)
-    canvas.create_rectangle(x, y+radius, x+width, y+height-radius, fill=bg_color, outline=bg_color)
-
-    button = canvas.create_text(x+width/2, y+height/2, text=text, fill=text_color, font=("Segoe UI", 12))
-
-    def on_click(event):
-        command()
-    
-    def on_enter(event):
-        canvas.config(cursor="hand2")
-    
-    def on_leave(event):
-        canvas.config(cursor="")
-
-    canvas.tag_bind(button, "<Button-1>", on_click)
-    canvas.tag_bind(button, "<Enter>", on_enter)
-    canvas.tag_bind(button, "<Leave>", on_leave)
-
-create_rounded_button(canvas, x=140, y=160, width=120, height=35, radius=18, bg_color="#FF0000", text_color="white", text="Download", command=start_download)
-
-info_label = tk.Label(root, text="ⓘ Right-click to paste from your clipboard", font=("Segoe UI", 10), bg="#0f0f0f", fg="red")
-info_label.pack(side=tk.BOTTOM, pady=10)
-
-root.mainloop()
+    def paste(self, event):
+        self.url_entry.event_generate("<<Paste>>")
+        
+    def show_instructions(self):
+        instructions = (
+            "YTDLPY - How to use:\n\n"
+            "1. Enter the YouTube video URL in the input field.\n"
+            "2. Choose your format preference (MP4 video or MP3 audio).\n"
+            "3. Select the desired quality:\n"
+            "   - High: Best available quality\n"
+            "   - Medium: 720p for videos, 192kbps for audio\n"
+            "   - Low: 480p for videos, 128kbps for audio\n"
+            "4. Select an output folder (optional).\n"
+            "5. Click the DOWNLOAD button to start downloading.\n"
+            "6. Monitor the download progress in the log window.\n\n"
+            "Note: You can paste the URL using the right-click or the Paste button."
+        )
+        messagebox.showinfo("Instructions", instructions)
+        
+    def start_download(self):
+        url = self.url_entry.get().strip()
+        format_type = self.format_var.get()
+        quality = self.quality_var.get()
+        
+        if not url:
+            messagebox.showwarning("Missing URL", "Please enter a valid URL.")
+            return
+            
+        self.result_label.config(text="Starting download...")
+        
+        # Create log window
+        log_window = tk.Toplevel(self.root)
+        log_window.title("Download Progress")
+        log_window.geometry("700x300")
+        log_window.configure(bg="#121212")
+        
+        # Configure log window grid
+        log_window.grid_columnconfigure(0, weight=1)
+        log_window.grid_rowconfigure(0, weight=0)
+        log_window.grid_rowconfigure(1, weight=1)
+        
+        status_label = ttk.Label(log_window, text="Downloading...", font=("Segoe UI", 12, "bold"))
+        status_label.grid(row=0, column=0, sticky="w", padx=10, pady=10)
+        
+        log_text = scrolledtext.ScrolledText(log_window, wrap=tk.WORD, font=("Consolas", 10), bg="#1E1E1E", fg="#CCCCCC")
+        log_text.grid(row=1, column=0, sticky="nsew", padx=10, pady=(0, 10))
+        
+        def log_callback(d):
+            if d['status'] == 'downloading':
+                _bytes = d.get('downloaded_bytes', 0)
+                total = d.get('total_bytes', 0) or d.get('total_bytes_estimate', 0)
+                
+                if total > 0:
+                    percent = _bytes / total * 100
+                    speed = d.get('speed', 0) or 0
+                    eta = d.get('eta', 0) or 0
+                    
+                    speed_str = f"{speed/1024/1024:.2f} MB/s" if speed else "unknown speed"
+                    eta_str = f"{eta//60}:{eta%60:02d}" if eta else "unknown"
+                    
+                    log_message = f"Downloading: {d.get('filename', 'Unknown')}\n"
+                    log_message += f"Progress: {_bytes/1024/1024:.2f} MB / {total/1024/1024:.2f} MB ({percent:.1f}%)\n"
+                    log_message += f"Speed: {speed_str}, ETA: {eta_str}\n"
+                else:
+                    log_message = f"Downloading: {d.get('filename', 'Unknown')} - {_bytes/1024/1024:.2f} MB downloaded\n"
+                
+                log_text.delete(1.0, tk.END)
+                log_text.insert(tk.END, log_message)
+                log_text.see(tk.END)
+                self.root.update_idletasks()
+            elif d['status'] == 'finished':
+                log_text.insert(tk.END, f"\nDownload finished! Post-processing...\n")
+                status_label.config(text="Processing...")
+                log_text.see(tk.END)
+                self.root.update_idletasks()
+        
+        def download_thread():
+            try:
+                # Convert quality value for MP3
+                mp3_quality = "0"  # High
+                if quality == "medium":
+                    mp3_quality = "5"
+                elif quality == "low":
+                    mp3_quality = "7"
+                
+                video_title, output_file = download_media(
+                    url, 
+                    format_type, 
+                    mp3_quality if format_type == "mp3" else quality,
+                    self.output_dir, 
+                    log_callback
+                )
+                
+                if video_title and output_file:
+                    status_label.config(text="Download Complete!")
+                    log_text.insert(tk.END, f"\nSuccess! File saved as: {output_file}\n")
+                    log_text.see(tk.END)
+                    
+                    self.result_label.config(text=f"Successfully downloaded: {video_title}")
+                    messagebox.showinfo("Download Complete", f"The file was successfully downloaded!\nSaved as: {output_file}")
+                else:
+                    status_label.config(text="Download Failed")
+                    self.result_label.config(text="Download failed. See error log for details.")
+            except Exception as e:
+                save_crash_log(e)
+                status_label.config(text="Error Occurred")
+                self.result_label.config(text="An error occurred. Check logs for details.")
+        
+        threading.Thread(target=download_thread, daemon=True).start()
+        
+# Main application execution
+if __name__ == "__main__":
+    try:
+        root = tk.Tk()
+        app = App(root)
+        root.mainloop()
+    except Exception as e:
+        save_crash_log(e)
+        messagebox.showerror("Critical Error", "The application failed to start.")
+        sys.exit(1)
