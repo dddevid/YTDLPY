@@ -34,6 +34,33 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
+    // Legal documents handling
+    const termsLink = document.getElementById('terms-link');
+    const privacyLink = document.getElementById('privacy-link');
+    
+    if (termsLink) {
+        termsLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            window.location.href = 'terms.html';
+        });
+    }
+    
+    if (privacyLink) {
+        privacyLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            window.location.href = 'privacy.html';
+        });
+    }
+    
+    // Also update the link in the download section
+    const downloadTermsLink = document.querySelector('.download-note a');
+    if (downloadTermsLink) {
+        downloadTermsLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            window.location.href = 'terms.html';
+        });
+    }
+    
     // FAQ accordion
     const faqItems = document.querySelectorAll('.faq-item');
     
