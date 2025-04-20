@@ -1,64 +1,110 @@
-# YTDLPY Installer
+# YTDLPY - Advanced YouTube Downloader
 
-![YTDLPY Logo](https://github.com/dddevid/YTDLPY/blob/main/icons/YTDLPY%20Logo.png?raw=true)  
+![YTDLPY Logo](https://github.com/dddevid/YTDLPY/blob/main/icons/YTDLPY%20Logo.png?raw=true)
 
-YTDLPY is a tool for downloading videos from various platforms. This repository provides both a portable version and an installer for the application.
+YTDLPY is a modern, powerful, and user-friendly application for downloading video and audio content from YouTube and other platforms. With its sleek dark-themed interface, YTDLPY offers various quality options and format choices to suit your needs.
 
-[Official website](https://dddevid.github.io/YTDLPY/)
+[Visit the Official Website](https://dddevid.github.io/YTDLPY/)
 
-## Overview
+## Features
 
-The YTDLPY application can be used to download videos easily. You can choose between a portable version and an installer version based on your preferences.
+- **Multiple Formats**: Download content as MP4 (video) or MP3 (audio only)
+- **Quality Options**: Choose between high, medium, or low quality for both video and audio
+- **Custom Save Location**: Select any folder on your computer to save your downloads
+- **Real-time Progress**: Monitor download progress with detailed information
+- **Modern Interface**: Clean, dark-themed UI that's intuitive and visually appealing
+- **Open Source**: Fully transparent codebase available on GitHub
 
-## Download
+## Screenshots
 
-You can download YTDLPY from the following links:
-
-- **Portable Version**: [YTDLPY_p.exe](https://www.dropbox.com/scl/fi/5tkvqe8yeya552rv2rbog/YTDLPY.exe?rlkey=3bmrkdx5dw8elhul701a6dkn0&st=7wserins&dl=1)
-- **Installer Version**: [YTDLPY_Inst.exe](https://github.com/dddevid/YTDLPY/releases/download/v1/YTDLPY_Inst.exe)
-
-## Application Icons
-
-Here are the icons used for the application:
-
-- ![YTDLPY Icon](https://github.com/dddevid/YTDLPY/blob/main/icons/YTDLPY.png?raw=true) (1290x1080)
+![YTDLPY Interface](https://github.com/dddevid/YTDLPY/blob/main/icons/YTDLPY.png?raw=true)
 
 ## Installation
 
-### Portable Version
+### Windows
 
-To use the portable version:
-1. Download the `YTDLPY_p.exe` file.
-2. Run the executable file directly without installation.
+#### Installer Version
+1. Download the latest installer from [YTDLPY Releases](https://github.com/dddevid/YTDLPY/releases/download/v2/YTDLPY.exe)
+2. Run the installer and follow the on-screen instructions
+3. Launch YTDLPY from your desktop shortcut or start menu
 
-### Installer Version
+#### Portable Version
+1. Download the portable executable from [YTDLPY Portable](https://github.com/dddevid/YTDLPY/releases/download/v2/YTDLPY_portable.exe)
+2. Run the executable directly without installation
 
-To use the installer version:
-1. Download the `YTDLPY_Inst.exe` file.
-2. Run the installer and follow the on-screen instructions to complete the installation.
-3. The installer will create shortcuts on your Desktop and in the Start Menu.
+### Linux & macOS
+Currently, YTDLPY only provides pre-built binaries for Windows. For Linux and macOS, you'll need to run the application from source:
+
+1. Clone the repository: `git clone https://github.com/dddevid/YTDLPY.git`
+2. Install required dependencies: `pip install -r requirements.txt`
+3. Run the application: `python main.py`
 
 ## How to Use
 
-1. Launch the YTDLPY application.
-2. Follow the prompts in the application to download videos from supported platforms.
+1. **Enter URL**: Paste the YouTube URL of the video you want to download
+2. **Select Format**: Choose between MP4 (video) or MP3 (audio)
+3. **Choose Quality**: Select your preferred quality level
+4. **Set Output Location**: (Optional) Select a folder to save your download
+5. **Download**: Click the DOWNLOAD button to start the process
+6. **Monitor Progress**: View real-time download information in the progress window
+
+## Future Plans
+
+We're actively working on improving YTDLPY with upcoming features:
+
+- **Rust Rewrite**: Complete rewrite in Rust for significantly improved performance
+- **Playlist Support**: Download entire playlists with a single click
+- **Multi-platform Support**: Native builds for macOS and Linux
+- **Advanced Options**: More format choices and customization options
+
+See our [Development Roadmap](https://dddevid.github.io/YTDLPY/#future) for more details.
+
+## Requirements
+
+- Windows 7 or later (for pre-built binaries)
+- Internet connection
+- 50MB free disk space (plus space for downloads)
+
+## Building from Source
+
+To build YTDLPY from source:
+
+1. Clone the repository:
+   ```
+   git clone https://github.com/dddevid/YTDLPY.git
+   ```
+
+2. Install dependencies:
+   ```
+   pip install -r requirements.txt
+   ```
+
+3. Build with PyInstaller:
+   ```
+   pyinstaller YTDLPY.spec
+   ```
 
 ## Contributing
 
-If you would like to contribute to the development of YTDLPY:
-1. Fork the repository.
-2. Create a new branch for your changes.
-3. Submit a pull request with a description of your changes.
+Contributions are welcome! If you'd like to contribute:
 
-## Issues
-
-If you encounter any issues with the application or have feature requests:
-- Open an issue on the [GitHub Issues page](https://github.com/dddevid/YTDLPY/issues).
+1. Fork the repository
+2. Create your feature branch: `git checkout -b feature/amazing-feature`
+3. Commit your changes: `git commit -m 'Add some amazing feature'`
+4. Push to the branch: `git push origin feature/amazing-feature`
+5. Open a Pull Request
 
 ## License
 
-This project is licensed under the [Fair Source License](https://github.com/dddevid/YTDLPY/blob/main/License/License.txt). Please review the license for details on usage and redistribution.
+This project is licensed under the Fair Source License - see the [LICENSE](https://github.com/dddevid/YTDLPY/blob/main/License/License.txt) file for details.
 
 ## Contact
 
-For any inquiries, please contact [devidrru@hotmail.com](mailto:devidrru@hotmail.com).
+For questions, suggestions or support, please contact:
+- Email: [devidrru@hotmail.com](mailto:devidrru@hotmail.com)
+- GitHub: [dddevid](https://github.com/dddevid)
+- Website: [https://dddevid.github.io/YTDLPY/](https://dddevid.github.io/YTDLPY/)
+
+---
+
+Made with ❤️ by dddevid
