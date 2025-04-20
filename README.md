@@ -25,9 +25,8 @@ YTDLPY is a modern, powerful, and user-friendly application for downloading vide
 ### Linux & macOS
 Currently, YTDLPY only provides pre-built binaries for Windows. For Linux and macOS, you'll need to run the application from source:
 
-1. Clone the repository: `git clone https://github.com/dddevid/YTDLPY.git`
-2. Install required dependencies: `pip install -r requirements.txt`
-3. Run the application: `python main.py`
+2. Install the library with pip + git: `pip install git+https://github.com/dddevid/pyfetch.git`
+3. Run the application: `pyfetch`
 
 ## How to Use
 
