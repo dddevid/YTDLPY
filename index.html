@@ -1,170 +1,314 @@
-document.addEventListener('DOMContentLoaded', function() {
-    // Mobile menu toggle
-    const hamburger = document.querySelector('.hamburger');
-    const navLinks = document.querySelector('.nav-links');
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YTDLPY - Advanced YouTube Downloader</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">
+                <img src="https://github.com/dddevid/YTDLPY/blob/main/icons/YTDLPY%20Logo.png?raw=true" alt="YTDLPY Logo">
+                <h1>YTDLPY</h1>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#features">Features</a></li>
+                <li><a href="#download">Download</a></li>
+                <li><a href="#future">Future Updates</a></li>
+                <li><a href="#faq">FAQ</a></li>
+                <li><a href="https://github.com/dddevid/YTDLPY" target="_blank">GitHub</a></li>
+            </ul>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </nav>
+    </header>
     
-    if (hamburger) {
-        hamburger.addEventListener('click', function() {
-            navLinks.classList.toggle('active');
-            hamburger.classList.toggle('active');
-        });
-    }
-    
-    // Smooth scrolling for anchor links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function(e) {
-            if (this.getAttribute('href') !== '#') {
-                e.preventDefault();
-                
-                const targetId = this.getAttribute('href');
-                const targetElement = document.querySelector(targetId);
-                
-                if (targetElement) {
-                    // Close mobile menu if open
-                    if (navLinks.classList.contains('active')) {
-                        navLinks.classList.remove('active');
-                    }
-                    
-                    window.scrollTo({
-                        top: targetElement.offsetTop - 80,
-                        behavior: 'smooth'
-                    });
-                }
-            }
-        });
-    });
-    
-    // Legal documents handling
-    const termsLink = document.getElementById('terms-link');
-    const privacyLink = document.getElementById('privacy-link');
-    
-    if (termsLink) {
-        termsLink.addEventListener('click', function(e) {
-            e.preventDefault();
-            window.location.href = 'terms.html';
-        });
-    }
-    
-    if (privacyLink) {
-        privacyLink.addEventListener('click', function(e) {
-            e.preventDefault();
-            window.location.href = 'privacy.html';
-        });
-    }
-    
-    // Also update the link in the download section
-    const downloadTermsLink = document.querySelector('.download-note a');
-    if (downloadTermsLink) {
-        downloadTermsLink.addEventListener('click', function(e) {
-            e.preventDefault();
-            window.location.href = 'terms.html';
-        });
-    }
-    
-    // FAQ accordion
-    const faqItems = document.querySelectorAll('.faq-item');
-    
-    faqItems.forEach(item => {
-        const question = item.querySelector('.faq-question');
-        
-        question.addEventListener('click', () => {
-            // Close all other FAQ items
-            faqItems.forEach(otherItem => {
-                if (otherItem !== item && otherItem.classList.contains('active')) {
-                    otherItem.classList.remove('active');
-                }
-            });
-            
-            // Toggle current FAQ item
-            item.classList.toggle('active');
-        });
-    });
-    
-    // Migliorata l'animazione on scroll per evitare che gli elementi scompaiano
-    const animateOnScroll = () => {
-        const elements = document.querySelectorAll('.feature-card, .download-content, .app-preview, .faq-item');
-        
-        elements.forEach(element => {
-            const elementTop = element.getBoundingClientRect().top;
-            const windowHeight = window.innerHeight;
-            
-            if (elementTop < windowHeight - 100) {
-                element.classList.add('visible');
-                
-                // Assicuriamoci che l'elemento rimanga visibile
-                element.style.opacity = '1';
-                element.style.transform = 'translateY(0)';
-            }
-        });
-    };
-    
-    // Modificato il setup delle animazioni per renderle più stabili
-    const setupAnimations = () => {
-        const elements = document.querySelectorAll('.feature-card, .download-content, .app-preview, .faq-item');
-        
-        elements.forEach((element, index) => {
-            // Impostare l'opacità iniziale e la trasformazione
-            element.style.opacity = '0';
-            element.style.transform = 'translateY(20px)';
-            element.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-            // Aggiunto un piccolo ritardo basato sull'indice per creare un effetto a cascata
-            element.style.transitionDelay = `${index * 0.1}s`;
-        });
-        
-        // Aggiungi la classe visible agli elementi
-        document.addEventListener('scroll', animateOnScroll);
-        
-        // Prima chiamata per mostrare gli elementi già visibili all'avvio
-        setTimeout(animateOnScroll, 300);
-    };
-    
-    setupAnimations();
-    
-    // Download button effect
-    const downloadBtn = document.querySelector('.download-btn');
-    if (downloadBtn) {
-        downloadBtn.addEventListener('click', function() {
-            // Add a visual feedback that the download started
-            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Downloading...';
-            
-            // Reset the button text after 2 seconds
-            setTimeout(() => {
-                this.innerHTML = '<i class="fas fa-download"></i> Download YTDLPY';
-            }, 2000);
-        });
-    }
-    
-    // Add loading animation to the page
-    window.addEventListener('load', function() {
-        document.body.classList.add('loaded');
-    });
-    
-    // Parallax effect to hero section, ottimizzato per evitare problemi di scroll
-    let ticking = false;
-    window.addEventListener('scroll', function() {
-        if (!ticking) {
-            window.requestAnimationFrame(function() {
-                const scrollPosition = window.scrollY;
-                const heroSection = document.querySelector('.hero');
-                const heroImage = document.querySelector('.hero-image');
-                
-                if (heroSection && heroImage && scrollPosition < heroSection.offsetHeight) {
-                    heroImage.style.transform = `translateY(${scrollPosition * 0.05}px)`;
-                }
-                ticking = false;
-            });
-            ticking = true;
-        }
-    });
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Download YouTube Videos with Ease</h1>
+            <p>YTDLPY is a modern, powerful and user-friendly YouTube downloader with support for MP4 and MP3 formats.</p>
+            <a href="#download" class="primary-btn">Get Started</a>
+        </div>
+        <div class="hero-image">
+            <img src="https://github.com/dddevid/YTDLPY/blob/main/icons/YTDLPY%20Logo.png?raw=true" alt="YTDLPY App Screenshot">
+        </div>
+    </section>
 
-    // Aggiunta classe CSS per rimuovere gli elementi animati se non più visibili
-    document.addEventListener('scroll', function() {
-        // Applicare solo se sono già stati visibili una volta
-        const animatedElements = document.querySelectorAll('.visible');
-        animatedElements.forEach(element => {
-            // Mantieni gli elementi visibili anche dopo l'animazione
-            element.style.opacity = '1';
-            element.style.transform = 'translateY(0)';
-        });
-    });
-});
+    <section id="features" class="features">
+        <h2>Key Features</h2>
+        <div class="feature-grid">
+            <div class="feature-card">
+                <i class="fas fa-film"></i>
+                <h3>Video & Audio Download</h3>
+                <p>Download content in MP4 (video) or MP3 (audio only) formats.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-sliders-h"></i>
+                <h3>Quality Options</h3>
+                <p>Choose between high, medium, or low quality to suit your needs.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-bolt"></i>
+                <h3>Fast & Efficient</h3>
+                <p>Optimized for speed with real-time download status updates.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-laptop"></i>
+                <h3>Modern UI</h3>
+                <p>Clean, dark-themed interface that's easy to use and visually appealing.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-folder-open"></i>
+                <h3>Custom Save Location</h3>
+                <p>Save downloads to any folder of your choice on your computer.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-code"></i>
+                <h3>Open Source</h3>
+                <p>Fully open-source software available on GitHub for transparency.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="download" class="download">
+        <div class="download-content">
+            <h2>Download YTDLPY</h2>
+            <p>Get the latest version and start downloading your favorite content today.</p>
+            <div class="version-info">
+                <span>Latest Version: 2.0</span>
+                <span>Platform: Windows</span>
+                <span>Size: 8.2 MB</span>
+            </div>
+            <a href="https://github.com/dddevid/YTDLPY/releases/download/v2/YTDLPY.exe" class="download-btn">
+                <i class="fas fa-download"></i> Download YTDLPY
+            </a>
+            <p class="download-note">By downloading, you agree to the <a href="#" class="link">Terms of Service</a></p>
+        </div>
+    </section>
+
+    <section class="screenshot">
+        <h2>See YTDLPY in Action</h2>
+        <div class="screenshot-container">
+            <div class="app-preview">
+                <div class="app-window">
+                    <div class="window-header">
+                        <div class="window-controls">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                        <div class="window-title">YTDLPY - Advanced YouTube Downloader</div>
+                    </div>
+                    <div class="window-content">
+                        <div class="app-interface">
+                            <div class="app-header">
+                                <h3>YTDLPY</h3>
+                                <p>Advanced YouTube Downloader</p>
+                            </div>
+                            <div class="app-input">
+                                <label>Enter Video URL:</label>
+                                <div class="input-group">
+                                    <input type="text" placeholder="https://www.youtube.com/watch?v=..." disabled>
+                                    <button>Paste</button>
+                                </div>
+                            </div>
+                            <div class="app-options">
+                                <div class="option-group">
+                                    <h4>Format:</h4>
+                                    <div class="radio-group">
+                                        <label>
+                                            <input type="radio" name="format" checked disabled>
+                                            <span>MP4 (Video)</span>
+                                        </label>
+                                        <label>
+                                            <input type="radio" name="format" disabled>
+                                            <span>MP3 (Audio)</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="option-group">
+                                    <h4>Quality:</h4>
+                                    <div class="radio-group">
+                                        <label>
+                                            <input type="radio" name="quality" checked disabled>
+                                            <span>High</span>
+                                        </label>
+                                        <label>
+                                            <input type="radio" name="quality" disabled>
+                                            <span>Medium (720p)</span>
+                                        </label>
+                                        <label>
+                                            <input type="radio" name="quality" disabled>
+                                            <span>Low (480p)</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="app-button">
+                                <button>DOWNLOAD</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="future" class="future-updates">
+        <h2>Future Updates</h2>
+        <div class="updates-container">
+            <div class="update-card">
+                <div class="update-icon">
+                    <i class="fas fa-rocket"></i>
+                </div>
+                <h3>Rust Rewrite</h3>
+                <p>We're working on a complete rewrite of YTDLPY in Rust, which will significantly improve performance and efficiency. Expect faster downloads and lower resource usage.</p>
+            </div>
+            <div class="update-card">
+                <div class="update-icon">
+                    <i class="fas fa-list"></i>
+                </div>
+                <h3>Playlist Support</h3>
+                <p>Soon you'll be able to download entire playlists with a single click, with options to select specific videos from the list.</p>
+            </div>
+            <div class="update-card">
+                <div class="update-icon">
+                    <i class="fas fa-globe"></i>
+                </div>
+                <h3>Multi-platform Support</h3>
+                <p>We're expanding YTDLPY to work on macOS and Linux in addition to Windows.</p>
+            </div>
+        </div>
+        <div class="roadmap">
+            <h3>Development Roadmap</h3>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-date">Q2 2025</div>
+                    <div class="timeline-content">
+                        <h4>Performance Optimization</h4>
+                        <p>Improving the current Python version with better threading and optimized file handling.</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-date">Q3 2025</div>
+                    <div class="timeline-content">
+                        <h4>Rust Alpha Release</h4>
+                        <p>First preview of the Rust rewrite with core functionality.</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-date">Q4 2025</div>
+                    <div class="timeline-content">
+                        <h4>Full Rust Release</h4>
+                        <p>Complete transition to Rust with all features implemented and performance improvements.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="faq" class="faq">
+        <h2>Frequently Asked Questions</h2>
+        <div class="faq-container">
+            <div class="faq-item">
+                <div class="faq-question">
+                    <h3>Is YTDLPY free to use?</h3>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>Yes, YTDLPY is completely free and open-source software. You can use it without any limitations.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-question">
+                    <h3>Is it safe to download and use?</h3>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>YTDLPY is safe to use and does not contain malware or adware. It's open-source, so you can verify the code yourself on GitHub.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-question">
+                    <h3>Which platforms are supported?</h3>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>YTDLPY currently supports Windows. Support for macOS and Linux may be added in future versions. Currently, Linux and macOS are only supported if you compile the program yourself using Python from <a href="https://github.com/dddevid/YTDLPY" target="_blank">https://github.com/dddevid/YTDLPY</a>.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-question">
+                    <h3>Can I download playlists?</h3>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>Currently, YTDLPY supports downloading individual videos. Playlist support is planned for a future update.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-question">
+                    <h3>What quality options are available?</h3>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>For MP4 videos, you can choose between high (best available), medium (720p), and low (480p). For MP3 audio, you can select high, medium, or low bitrate options.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">
+                <img src="https://github.com/dddevid/YTDLPY/blob/main/icons/YTDLPY%20Logo.png?raw=true" alt="YTDLPY Logo">
+                <h2>YTDLPY</h2>
+            </div>
+            <div class="footer-links">
+                <div class="footer-column">
+                    <h3>Links</h3>
+                    <ul>
+                        <li><a href="#features">Features</a></li>
+                        <li><a href="#download">Download</a></li>
+                        <li><a href="#future">Future Updates</a></li>
+                        <li><a href="#faq">FAQ</a></li>
+                        <li><a href="https://github.com/dddevid/YTDLPY">GitHub</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Legal</h3>
+                    <ul>
+                        <li><a href="#" id="terms-link">Terms of Service</a></li>
+                        <li><a href="#" id="privacy-link">Privacy Policy</a></li>
+                        <li><a href="https://raw.githubusercontent.com/dddevid/YTDLPY/refs/heads/main/License/License.txt" target="_blank">License</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Contact</h3>
+                    <ul>
+                        <li><a href="mailto:devidrru@hotmail.com">Email</a></li>
+                        <li><a href="https://github.com/dddevid">GitHub</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 YTDLPY. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
