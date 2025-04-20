@@ -15,22 +15,12 @@ YTDLPY is a modern, powerful, and user-friendly application for downloading vide
 - **Modern Interface**: Clean, dark-themed UI that's intuitive and visually appealing
 - **Open Source**: Fully transparent codebase available on GitHub
 
-## Screenshots
-
-![YTDLPY Interface](https://github.com/dddevid/YTDLPY/blob/main/icons/YTDLPY.png?raw=true)
-
 ## Installation
 
 ### Windows
-
-#### Installer Version
 1. Download the latest installer from [YTDLPY Releases](https://github.com/dddevid/YTDLPY/releases/download/v2/YTDLPY.exe)
 2. Run the installer and follow the on-screen instructions
 3. Launch YTDLPY from your desktop shortcut or start menu
-
-#### Portable Version
-1. Download the portable executable from [YTDLPY Portable](https://github.com/dddevid/YTDLPY/releases/download/v2/YTDLPY_portable.exe)
-2. Run the executable directly without installation
 
 ### Linux & macOS
 Currently, YTDLPY only provides pre-built binaries for Windows. For Linux and macOS, you'll need to run the application from source:
