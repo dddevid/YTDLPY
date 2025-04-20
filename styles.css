@@ -907,7 +907,7 @@ footer {
     
     .version-info {
         flex-direction: column;
-        gap: 1rem;
+        gap: 2rem;
     }
     
     .app-interface {
