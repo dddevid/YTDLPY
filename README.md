@@ -1,6 +1,6 @@
 # YTDLPY - Advanced YouTube Downloader
 
-![YTDLPY Logo](https://github.com/dddevid/YTDLPY/blob/main/icons/YTDLPY%20Logo.png?raw=true)
+![YTDLPY Logo](https://github.com/dddevid/YTDLPY/blob/main/icons/YTDLPY%20resized.png?raw=true)
 
 YTDLPY is a modern, powerful, and user-friendly application for downloading video and audio content from YouTube and other platforms. With its sleek dark-themed interface, YTDLPY offers various quality options and format choices to suit your needs.
 
