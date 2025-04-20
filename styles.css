@@ -771,6 +771,19 @@ footer {
     line-height: 1.5;
 }
 
+.timeline-item.completed .timeline-dot {
+    background-color: #28c840;  /* verde per indicare completamento */
+}
+
+.timeline-item.completed .timeline-content h4 {
+    color: #28c840;  /* stessa tonalità verde */
+}
+
+.timeline-item.completed .timeline-content h4 i {
+    margin-left: 8px;
+    font-size: 0.9rem;
+}
+
 /* Responsive Design */
 @media (max-width: 1100px) {
     .hero {
