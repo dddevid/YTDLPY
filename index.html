@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YTDLPY</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script>
+        // Funzione globale per l'aggiornamento della UI dal backend Python
+        function updateProgressUI(data) {
+            if (!window.appInitialized) {
+                // Se l'app non è ancora inizializzata, memorizza i dati per elaborarli dopo
+                window.pendingProgressUpdates = window.pendingProgressUpdates || [];
+                window.pendingProgressUpdates.push(data);
+                return;
+            }
+            
+            const progressBar = document.getElementById('progress');
+            const progressText = document.getElementById('progress-text');
+            const progressFile = document.getElementById('progress-file');
+            const progressStats = document.getElementById('progress-stats');
+            const logText = document.getElementById('log-text');
+            const modalStatus = document.getElementById('modal-status');
+            
+            if (data.status === 'downloading') {
+                const percent = data.percent || 0;
+                progressBar.style.width = `${percent}%`;
+                progressText.textContent = `${Math.round(percent)}%`;
+                
+                if (data.filename) {
+                    progressFile.textContent = data.filename;
+                }
+                
+                let statsText = '';
+                if (data.speed) {
+                    statsText += `Speed: ${data.speed} | `;
+                }
+                if (data.eta) {
+                    statsText += `ETA: ${data.eta}`;
+                }
+                progressStats.textContent = statsText;
+                
+                if (data.log) {
+                    logText.textContent += data.log + '\n';
+                    logText.scrollTop = logText.scrollHeight;
+                }
+
+                // Mostra la modale se non è già visibile
+                document.getElementById('progress-modal').style.display = 'flex';
+            } 
+            else if (data.status === 'finished') {
+                progressBar.style.width = '100%';
+                progressText.textContent = '100%';
+                modalStatus.textContent = 'Processing...';
+                
+                if (data.log) {
+                    logText.textContent += data.log + '\n';
+                    logText.scrollTop = logText.scrollHeight;
+                }
+            } 
+            else if (data.status === 'complete') {
+                modalStatus.textContent = 'Download Complete!';
+                
+                // Verifico se il pulsante di chiusura è già presente
+                if (!document.querySelector('.modal-body .close-btn')) {
+                    // Aggiungi pulsante di chiusura
+                    const closeButton = document.createElement('button');
+                    closeButton.textContent = 'Close';
+                    closeButton.className = 'btn-secondary close-btn';
+                    closeButton.style.marginTop = '20px';
+                    closeButton.style.alignSelf = 'flex-end';
+                    closeButton.onclick = () => document.getElementById('progress-modal').style.display = 'none';
+                    
+                    document.querySelector('.modal-body').appendChild(closeButton);
+                }
+            }
+            else if (data.status === 'error') {
+                modalStatus.textContent = 'Error';
+                
+                if (data.log) {
+                    logText.textContent += data.log + '\n';
+                    logText.scrollTop = logText.scrollHeight;
+                }
+                
+                // Verifico se il pulsante di chiusura è già presente
+                if (!document.querySelector('.modal-body .close-btn')) {
+                    const closeButton = document.createElement('button');
+                    closeButton.textContent = 'Close';
+                    closeButton.className = 'btn-secondary close-btn';
+                    closeButton.style.marginTop = '20px';
+                    closeButton.style.alignSelf = 'flex-end';
+                    closeButton.onclick = () => document.getElementById('progress-modal').style.display = 'none';
+                    
+                    document.querySelector('.modal-body').appendChild(closeButton);
+                }
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <!-- Glass card main container -->
+        <div class="glass-card">
+            <!-- Header with logo and title -->
+            <div class="header">
+                <div class="logo-title">
+                    <img src="https://github.com/dddevid/YTDLPY/blob/main/icons/YTDLPY%20Logo.png?raw=true" alt="YTDLPY Logo" class="logo">
+                    <div>
+                        <h1>YTDLPY</h1>
+                        <p class="subtitle">Advanced YouTube Downloader</p>
+                    </div>
+                </div>
+                <button id="instructions-btn" class="btn-icon glass-btn">
+                    <i class="fas fa-question-circle"></i>
+                </button>
+            </div>
+
+            <!-- URL Input Section -->
+            <div class="input-section">
+                <label for="url-input">Enter Video URL:</label>
+                <div class="url-input-container">
+                    <input type="text" id="url-input" placeholder="Paste YouTube URL here">
+                    <button id="paste-btn" class="btn-secondary">
+                        <i class="fas fa-paste"></i> Paste
+                    </button>
+                </div>
+            </div>
+
+            <!-- Options Section -->
+            <div class="options-container">
+                <!-- Format Options -->
+                <div class="option-card">
+                    <h3>Format</h3>
+                    <div class="option-group">
+                        <label class="radio-container">
+                            <input type="radio" name="format" value="mp4" checked>
+                            <span class="custom-radio"></span>
+                            MP4 (Video)
+                        </label>
+                        <label class="radio-container">
+                            <input type="radio" name="format" value="mp3">
+                            <span class="custom-radio"></span>
+                            MP3 (Audio)
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Quality Options -->
+                <div class="option-card">
+                    <h3>Quality</h3>
+                    <div class="option-group">
+                        <label class="radio-container">
+                            <input type="radio" name="quality" value="high" checked>
+                            <span class="custom-radio"></span>
+                            High
+                        </label>
+                        <label class="radio-container">
+                            <input type="radio" name="quality" value="medium">
+                            <span class="custom-radio"></span>
+                            Medium (720p)
+                        </label>
+                        <label class="radio-container">
+                            <input type="radio" name="quality" value="low">
+                            <span class="custom-radio"></span>
+                            Low (480p)
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Output Option -->
+                <div class="option-card">
+                    <h3>Output</h3>
+                    <div class="option-group">
+                        <button id="select-folder-btn" class="btn-secondary">
+                            <i class="fas fa-folder"></i> Select Folder
+                        </button>
+                        <div class="selected-path" id="output-path">Default folder</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Result Status -->
+            <div class="status-container">
+                <div id="result-status">Ready to download</div>
+            </div>
+
+            <!-- Download Button Section -->
+            <div class="download-section">
+                <button id="download-btn" class="btn-primary">
+                    <i class="fas fa-download"></i> DOWNLOAD
+                </button>
+                <div class="version-info">
+                    <div>Version 2.0</div>
+                    <a href="#" id="github-link">Visit GitHub</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Progress Modal -->
+    <div id="progress-modal" class="modal">
+        <div class="modal-content glass-card">
+            <div class="modal-header">
+                <h2 id="modal-status">Downloading...</h2>
+            </div>
+            <div class="modal-body">
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div id="progress" class="progress-fill"></div>
+                    </div>
+                    <div id="progress-text">0%</div>
+                </div>
+                <div class="progress-details">
+                    <div id="progress-file">Preparing download...</div>
+                    <div id="progress-stats"></div>
+                </div>
+                <pre id="log-text" class="log-area"></pre>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
